@@ -128,8 +128,7 @@ program = [
 
 ]
 
-for instr in program:
-    cpu.execute(instr)
+cpu.run(program)
 
 print("R0:", print_ternary(regs.read("R0")))
 print("Memory[0]:", print_ternary(mem.read(0)))
