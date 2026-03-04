@@ -2,6 +2,10 @@ from alu import add_ternary, subtract
 from conversion import to_balanced_ternary
 
 
+def is_zero(value):
+    return all(v == 0 for v in value)
+
+
 class CPU:
 
     def __init__(self, registers, memory):
@@ -66,6 +70,35 @@ class CPU:
             value = self.registers.read(reg)
 
             self.memory.write(addr, value)
+
+
+        elif op == "JMP":
+
+            addr = instruction[1]
+
+            self.pc = addr - 1
+
+
+        elif op == "JZ":
+
+            reg = instruction[1]
+            addr = instruction[2]
+
+            value = self.registers.read(reg)
+
+            if is_zero(value):
+                self.pc = addr - 1
+
+
+        elif op == "JNZ":
+
+            reg = instruction[1]
+            addr = instruction[2]
+
+            value = self.registers.read(reg)
+
+            if not is_zero(value):
+                self.pc = addr - 1
 
 
     def run(self, program):
