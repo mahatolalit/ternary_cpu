@@ -7,12 +7,15 @@ class CPU:
     def __init__(self, registers, memory):
         self.registers = registers
         self.memory = memory
+        self.pc = 0
+
 
     def execute(self, instruction):
 
         op = instruction[0]
 
         if op == "MOV":
+
             reg = instruction[1]
             value = instruction[2]
 
@@ -20,6 +23,7 @@ class CPU:
 
 
         elif op == "ADD":
+
             r1 = instruction[1]
             r2 = instruction[2]
 
@@ -32,6 +36,7 @@ class CPU:
 
 
         elif op == "SUB":
+
             r1 = instruction[1]
             r2 = instruction[2]
 
@@ -61,3 +66,16 @@ class CPU:
             value = self.registers.read(reg)
 
             self.memory.write(addr, value)
+
+
+    def run(self, program):
+
+        self.pc = 0
+
+        while self.pc < len(program):
+
+            instruction = program[self.pc]
+
+            self.execute(instruction)
+
+            self.pc += 1
