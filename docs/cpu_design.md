@@ -20,10 +20,12 @@ Fetch → Decode → Execute
 
 The CPU consists of the following major components:
 
-- Program Counter (PC)
-- Register File
-- Arithmetic Logic Unit (ALU)
-- Memory Interface
+- **Program Counter (PC)** — address of the next instruction
+- **Register File** — R0–R8 general purpose + FLAGS
+  - R0 is the *zero register*: always reads 0, writes are ignored
+  - FLAGS stores the result of the last operation: `sign` (trit 0), `carry` (trit 1), `zero` (trit 2)
+- **Arithmetic Logic Unit (ALU)** — arithmetic, logical, and tritwise operations
+- **Memory Interface** — 729-cell balanced-ternary address space (addresses −364…+364)
 
 ---
 
@@ -85,47 +87,40 @@ The opcode determines which operation to execute.
 
 The CPU executes the instruction depending on the opcode.
 
-Example operations:
-
 ### Arithmetic
 
 ```
-
-ADD Ra Rb
-Ra = Ra + Rb
-
+ADD Ra Rb    →  Ra = Ra + Rb
+SUB Ra Rb    →  Ra = Ra - Rb
+NEG Ra       →  Ra = -Ra
+MUL Ra Rb    →  Ra = Ra × Rb  (lower 9 trits)
 ```
 
-### Memory
+### Tritwise Logic
 
 ```
-
-LOAD Ra addr
-Ra = memory[addr]
-
-```
+TAND Ra Rb   →  Ra = Ra AND Rb  (per-trit min)
+TOR  Ra Rb   →  Ra = Ra OR  Rb  (per-trit max)
+TMUL Ra Rb   →  Ra = Ra ×  Rb  (per-trit Galois mod 3)
 ```
 
-STORE Ra addr
-memory[addr] = Ra
+### Data Movement
 
+```
+MOV  Ra imm        →  Ra = imm
+LOAD Ra Rb imm     →  Ra = MEM[Rb + imm]
+STORE Ra Rb imm    →  MEM[Ra + imm] = Rb
 ```
 
 ### Control Flow
 
 ```
-
-JMP addr
-PC = addr
-
-```
+JMP  imm         →  PC = imm
+JZ   Ra imm      →  if FLAGS.zero:  PC = imm
+JNZ  Ra imm      →  if !FLAGS.zero: PC = imm
 ```
 
-JNZ Ra addr
-if Ra != 0:
-PC = addr
-
-```
+Every instruction updates FLAGS (sign, carry, zero) based on the result.
 
 ---
 
@@ -168,9 +163,9 @@ running = False
 Possible future improvements:
 
 - pipeline stages
-- stack support
-- interrupts
-- assembler
-- machine code encoding
+- stack support (`PUSH` / `POP`)
+- interrupts and exception handling
+- assembler for text-format programs
+- floating-point trit encoding
 
 ---
