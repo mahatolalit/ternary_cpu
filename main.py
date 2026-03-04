@@ -132,3 +132,25 @@ cpu.run(program)
 
 print("R0:", print_ternary(regs.read("R0")))
 print("Memory[0]:", print_ternary(mem.read(0)))
+
+
+#Testing Loop Program
+print("\nTesting Loop Program")
+
+regs = Registers()
+mem = Memory()
+cpu = CPU(regs, mem)
+
+program = [
+
+    ("MOV", "R0", 5),
+    ("MOV", "R1", 1),
+
+    ("SUB", "R0", "R1"),
+    ("JNZ", "R0", 2),
+
+]
+
+cpu.run(program)
+
+print("Final R0:", print_ternary(regs.read("R0")))
