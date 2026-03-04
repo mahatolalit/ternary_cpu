@@ -2,16 +2,25 @@
 
 A balanced-ternary 9-trit CPU emulator written in Python.
 
+## Documentation
+
+| Doc | Contents |
+|-----|----------|
+| [docs/isa.md](docs/isa.md) | Full ISA — number system, word size, registers, instruction format, opcode table, examples |
+| [docs/cpu_design.md](docs/cpu_design.md) | CPU execution model — fetch/decode/execute stages, pipeline, halt behaviour |
+
 ## Architecture
 
-| Property         | Value                            |
-|------------------|----------------------------------|
-| Number system    | Balanced ternary (trits: −1, 0, +1) |
-| Word size        | 9 trits (values −9841 … +9841)   |
-| Instruction width | 18 trits (2 memory words)       |
-| Registers        | R0–R8 (GP) + PC + FLAGS          |
-| Memory           | 729 cells (3⁶), addresses −364…+364 |
-| Architecture     | RISC-style, fixed instruction width |
+| Property          | Value                               |
+|-------------------|-------------------------------------|
+| Number system     | Balanced ternary (trits: −1, 0, +1) |
+| Word size         | 9 trits (values −9841 … +9841)      |
+| Instruction width | 18 trits (2 memory words)           |
+| Registers         | R0–R8 (GP) + PC + FLAGS             |
+| Memory            | 729 cells (3⁶), addresses −364…+364 |
+| Architecture      | RISC-style, fixed instruction width |
+
+→ Full execution model: [docs/cpu_design.md](docs/cpu_design.md)
 
 ## Directory Structure
 
@@ -41,31 +50,20 @@ ternary_cpu/
 
 ## Instruction Set
 
-| Opcode | Mnemonic | Operation                       |
-|-------:|----------|----------------------------------|
-|      0 | NOP      | No operation                    |
-|      1 | MOV      | RA ← immediate                  |
-|      2 | ADD      | RA ← RA + RB                    |
-|      3 | SUB      | RA ← RA − RB                    |
-|      4 | NEG      | RA ← −RA                        |
-|      5 | LOAD     | RA ← MEM[RB + imm]              |
-|      6 | STORE    | MEM[RA + imm] ← RB              |
-|      7 | JMP      | PC ← imm                        |
-|      8 | JZ       | if zero: PC ← imm               |
-|      9 | JNZ      | if not zero: PC ← imm           |
-|     10 | TAND     | RA ← RA AND RB (tritwise)       |
-|     11 | TOR      | RA ← RA OR  RB (tritwise)       |
-|     12 | TMUL     | RA ← RA * RB   (tritwise Galois)|
-|     13 | MUL      | RA ← RA × RB   (arithmetic)     |
-|    −13 | HALT     | Stop execution                   |
+This CPU implements 15 opcodes. For the full opcode table, instruction
+format, register encoding, and usage examples see
+[docs/isa.md](docs/isa.md).
 
-## Instruction Format (18 trits)
+**Quick reference:**
 
-```
-memory[PC]     =  [ op2 op1 op0 | ra1 ra0 | rb1 rb0 | fl1 fl0 ]
-                   ─── opcode     ── RA ──   ── RB ──   flags
-memory[PC + 1] =  [ imm8 imm7 … imm0 ]
-```
+| Group | Mnemonics |
+|-------|-----------|
+| Data movement | `MOV`, `LOAD`, `STORE` |
+| Arithmetic | `ADD`, `SUB`, `NEG`, `MUL` |
+| Tritwise logic | `TAND`, `TOR`, `TMUL` |
+| Control flow | `JMP`, `JZ`, `JNZ`, `HALT`, `NOP` |
+
+→ Full opcode table and encoding: [docs/isa.md](docs/isa.md)
 
 ## Quick Start
 
