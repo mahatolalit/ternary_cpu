@@ -35,20 +35,15 @@ A trit has three possible values:
 Symbol representation used in this project:
 
 ```
-
-* = -1
-  0  =  0
-
-- = +1
-
+-  =  −1   (also accepted: _ N n)
+0  =   0   (also accepted: z Z)
++  =  +1   (also accepted: 1 p P)
 ```
 
-Example ternary number:
+Example ternary number (value = 8):
 
 ```
-
-* * 0 +
-
++ 0 -
 ```
 
 ---
@@ -96,28 +91,26 @@ since:
 
 # Registers
 
-The CPU contains **9 general-purpose registers**.
+The CPU contains **9 general-purpose registers** plus two special registers.
 
 ```
-
-R0
-R1
-R2
-R3
-R4
-R5
-R6
-R7
-R8
-
+R0  R1  R2  R3  R4  R5  R6  R7  R8
 ```
+
+> **R0 is the zero register.** Reads always return 0; writes are silently ignored.
+> Use R0 as a `null` operand or to cheaply load zero into another register.
+
+Special registers (not directly addressable):
+
+| Register | Purpose |
+|----------|---------|
+| PC | Program Counter — address of the next instruction |
+| FLAGS | Condition flags: `sign` (trit 0), `carry` (trit 1), `zero` (trit 2) |
 
 Each register stores:
 
 ```
-
 1 word (9 trits)
-
 ```
 
 Registers are used for:
@@ -208,21 +201,23 @@ Explanation:
 
 # Opcode Table
 
-| Opcode | Instruction | Description |
-|------|-------------|-------------|
-| 0 | NOP | no operation |
-| 1 | MOV | move immediate to register |
-| 2 | ADD | register addition |
-| 3 | SUB | register subtraction |
-| 4 | NEG | negate register |
-| 5 | LOAD | load memory into register |
-| 6 | STORE | store register to memory |
-| 7 | JMP | unconditional jump |
-| 8 | JZ | jump if register is zero |
-| 9 | JNZ | jump if register not zero |
-| 10 | HALT | stop execution |
-
-Remaining opcodes are reserved for future expansion.
+| Opcode | Mnemonic | Description |
+|-------:|----------|-------------|
+|      0 | NOP      | no operation |
+|      1 | MOV      | RA ← immediate |
+|      2 | ADD      | RA ← RA + RB |
+|      3 | SUB      | RA ← RA − RB |
+|      4 | NEG      | RA ← −RA |
+|      5 | LOAD     | RA ← MEM[RB + imm] |
+|      6 | STORE    | MEM[RA + imm] ← RB |
+|      7 | JMP      | PC ← imm |
+|      8 | JZ       | if FLAGS.zero: PC ← imm |
+|      9 | JNZ      | if not FLAGS.zero: PC ← imm |
+|     10 | TAND     | RA ← RA AND RB  (tritwise) |
+|     11 | TOR      | RA ← RA OR RB   (tritwise) |
+|     12 | TMUL     | RA ← RA × RB    (tritwise Galois, no carry) |
+|     13 | MUL      | RA ← RA × RB    (full arithmetic multiply) |
+|    −13 | HALT     | stop execution |
 
 ---
 
@@ -327,17 +322,13 @@ Ra = -Ra
 ## LOAD
 
 ```
-
-LOAD Ra address
-
+LOAD Ra Rb imm
 ```
 
-Loads memory value into register.
+Loads memory value at address `Rb + imm` into register `Ra`.
 
 ```
-
-Ra = MEM[address]
-
+Ra = MEM[Rb + imm]
 ```
 
 ---
@@ -345,17 +336,13 @@ Ra = MEM[address]
 ## STORE
 
 ```
-
-STORE Ra address
-
+STORE Ra Rb imm
 ```
 
-Stores register value into memory.
+Stores register `Rb` to memory at address `Ra + imm`.
 
 ```
-
-MEM[address] = Ra
-
+MEM[Ra + imm] = Rb
 ```
 
 ---
@@ -416,6 +403,62 @@ PC = address
 
 ---
 
+## TAND
+
+```
+TAND Ra Rb
+```
+
+Trit-wise AND (min) of `Ra` and `Rb`, result stored in `Ra`.
+
+```
+Ra = Ra AND Rb   (per-trit)
+```
+
+---
+
+## TOR
+
+```
+TOR Ra Rb
+```
+
+Trit-wise OR (max) of `Ra` and `Rb`, result stored in `Ra`.
+
+```
+Ra = Ra OR Rb    (per-trit)
+```
+
+---
+
+## TMUL
+
+```
+TMUL Ra Rb
+```
+
+Trit-wise Galois-field multiply (no carry), result stored in `Ra`.
+
+```
+Ra = Ra * Rb     (per-trit, mod 3)
+```
+
+---
+
+## MUL
+
+```
+MUL Ra Rb
+```
+
+Full arithmetic multiply. Result is the lower 9 trits stored in `Ra`.
+
+```
+Ra = Ra × Rb
+```
+
+---
+
 ## HALT
 
 ```
@@ -459,12 +502,12 @@ Execution:
 
 Possible future features:
 
-- ternary machine code encoding
-- assembler for `.asm` files
-- stack instructions
-- function calls
-- interrupts
+- assembler for `.asm` / `.tas` files
+- stack instructions (`PUSH`, `POP`)
+- function call / return (`CALL`, `RET`)
+- interrupts and exception handling
 - memory segmentation
+- floating-point or extended-precision trits
 
 ---
 
