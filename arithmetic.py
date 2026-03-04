@@ -1,3 +1,13 @@
+#Add Helper function to normalize numbers
+def normalize(num):
+
+    i = 0
+
+    while i < len(num) - 1 and num[i] == 0:
+        i += 1
+
+    return num[i:]
+
 def add_trit(a, b, carry=0):
     s = a + b + carry
 
@@ -29,4 +39,4 @@ def add_ternary(a, b):
     if carry != 0:
         result.insert(0, carry)
 
-    return result
+    return normalize(result)
